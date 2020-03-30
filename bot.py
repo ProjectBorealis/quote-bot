@@ -184,4 +184,4 @@ async def listquotes(ctx):
     await ctx.author.send("Available quotes: {0}".format(", ".join(quote_nums)))
 
 
-bot.run("TOKEN")
+bot.run(os.environ['QUOTE_TOKEN'])
