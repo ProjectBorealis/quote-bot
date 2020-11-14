@@ -1,3 +1,4 @@
+  GNU nano 4.8                                                               Pipfile                                                                Modified  
 [[source]]
 name = "pypi"
 url = "https://pypi.org/simple"
@@ -6,11 +7,14 @@ verify_ssl = true
 [dev-packages]
 
 [packages]
-discord = {py = "*"}
 pytesseract = "*"
 Pillow = "*"
 tinydb = "*"
-fuzzywuzzy = {extras = ["speedup"],version = "*"}
+"discord.py" = "*"
 
 [requires]
 python_version = "3.8"
+
+[packages.fuzzywuzzy]
+extras = [ "speedup",]
+version = "*"
