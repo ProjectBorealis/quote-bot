@@ -235,7 +235,7 @@ async def addquote(ctx):
         channel = ctx.message.channel
         async for prev_msg in channel.history(limit=10):
             if ctx.author == prev_msg.author and len(message.attachments) > 0:
-                message = prev_msg     
+                message = prev_msg
                 break
     if len(message.attachments) > 0:
         attachment = message.attachments[0]
