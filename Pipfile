@@ -1,0 +1,16 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[dev-packages]
+
+[packages]
+discord = {py = "*"}
+pytesseract = "*"
+Pillow = "*"
+tinydb = "*"
+fuzzywuzzy = {extras = ["speedup"],version = "*"}
+
+[requires]
+python_version = "3.8"
