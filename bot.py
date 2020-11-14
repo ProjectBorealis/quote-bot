@@ -81,6 +81,80 @@ def find(pattern, path):
                 return os.path.join(root, name)
 
 
+async def on_strike_updates():
+    return
+    bot.should_update = False
+    for guild in bot.guilds:
+        strike_list = discord.utils.find(lambda c: c.name == "strike-groups", guild.text_channels)
+        if strike_list is None:
+            print("strike-groups not found!")
+            return
+        await strike_list.purge(limit=None, bulk=False)
+        for category in guild.categories:
+            category_name = category.name
+            if "groups" not in category_name.lower():
+                continue
+            channels = category.text_channels
+            for channel in channels:
+                name = channel.name
+                topic = channel.topic
+                creation_date = channel.created_at
+                overwrites = channel.overwrites
+                members = []
+                for key, value in overwrites.items():
+                    if isinstance(key, discord.Member):
+                        members.append(str(key))
+                everyone = overwrites.get(guild.default_role, None)
+                privacy = "Open"
+                if everyone:
+                    if everyone.read_messages is None or everyone.read_messages is True:
+                        privacy = "Read Only"
+                    else:
+                        privacy = "Private"
+                embed = discord.Embed()
+                embed.add_field(name="Name", value=name)
+                embed.add_field(name="Category", value=category_name)
+                if topic:
+                    embed.add_field(name="Description", value=topic)
+                embed.add_field(name="Creation Date", value="{0} UTC".format(creation_date))
+                embed.add_field(name="Privacy", value=privacy)
+                if len(members) > 0:
+                    member_string = ", ".join(members)
+                    embed.add_field(name="Members", value=member_string)
+                await strike_list.send(embed=embed)
+
+
+@bot.listen()
+async def on_ready():
+    populate = True
+    if populate:
+        await on_strike_updates()
+    print("Ready.")
+
+async def channel_event(channel):
+    if channel and isinstance(channel, discord.TextChannel) and channel.category \
+            and "groups" in channel.category.name.lower():
+        if not bot.should_update:
+            bot.should_update = True
+            bot.loop.call_later(1800, on_strike_updates)
+
+
+@bot.listen()
+async def on_guild_channel_delete(channel):
+    await channel_event(channel)
+
+
+@bot.listen()
+async def on_guild_channel_create(channel):
+    await channel_event(channel)
+
+
+@bot.listen()
+async def on_guild_channel_update(before, after):
+    await channel_event(before)
+    await channel_event(after)
+
+
 @bot.command(name="quote", help="get a specific or random quote")
 async def quote(ctx, *args):
     if ctx.author.bot:
@@ -156,8 +230,15 @@ async def searchquotes(ctx, *, arg):
 
 @bot.command(name="addquote", help="add a quote by attaching an image through Discord")
 async def addquote(ctx):
-    if len(ctx.message.attachments) > 0:
-        attachment = ctx.message.attachments[0]
+    message = ctx.message
+    if len(message.attachments) < 1:
+        channel = ctx.message.channel
+        async for prev_msg in channel.history(limit=10):
+            if ctx.author == prev_msg.author and len(message.attachments) > 0:
+                message = prev_msg     
+                break
+    if len(message.attachments) > 0:
+        attachment = message.attachments[0]
         ext = attachment.filename.rsplit(".", 1)[1]
         ext = ext.lower()
         if ext in image_exts and attachment.height > 0 and attachment.width > 0 or ext in other_exts:
