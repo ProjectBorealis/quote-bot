@@ -172,7 +172,7 @@ async def quote(ctx, *args):
                 quote_num = pending_num
         except ValueError:
             pass
-    if quote_num is -1:
+    if quote_num == -1:
         valid_id = False
         quote_num = random.choice(get_quote_nums())
     file_name = find("{0}.*".format(quote_num), "quotes/")
