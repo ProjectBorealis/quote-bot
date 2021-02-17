@@ -85,10 +85,11 @@ async def on_strike_updates():
     bot.should_update = False
     for guild in bot.guilds:
         strike_list = discord.utils.find(lambda c: c.name == "strike-groups", guild.text_channels)
-        try:
-            category = discord.utils.find(lambda c: c.name == "Reference", guild.categories)
-            if category:
-                strike_list = await guild.create_text_channel("strike-groups", category=category, topic="A list of strike group channels.")
+        if strike_list is None:
+            try:
+                category = discord.utils.find(lambda c: c.name == "Reference", guild.categories)
+                if category:
+                    strike_list = await guild.create_text_channel("strike-groups", category=category, topic="A list of strike group channels.")
         except:
             print("could not create channel")
         if strike_list is None:
