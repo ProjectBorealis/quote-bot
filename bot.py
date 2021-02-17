@@ -7,13 +7,22 @@ import random
 import sched
 
 import discord
+from discord.ext.commands import when_mentioned_or
 import pytesseract
 from PIL import Image, ImageFilter, ImageEnhance, ImageOps
 from discord.ext import commands
 from fuzzywuzzy import process
 from tinydb import TinyDB, Query
 
-bot = commands.Bot(command_prefix="!")
+intents = discord.Intents.default()
+intents.members = True
+
+bot = commands.Bot(command_prefix=when_mentioned_or("!"),
+                   case_insensitive=True,
+                   max_messages=10_000,
+                   intents=intents
+)
+
 bot.needs_quote_nums_update = True
 bot.cached_quote_nums = []
 
