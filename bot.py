@@ -141,7 +141,7 @@ async def on_strike_updates():
 
 @bot.listen()
 async def on_ready():
-    populate = True
+    populate = False
     if populate:
         await on_strike_updates()
     print("Ready.")
